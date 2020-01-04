@@ -41,6 +41,21 @@ const styles = StyleSheet.create({
   areaOpts: {
     width: 300,
   },
+  buttonContato: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: '#999',
+    width: 220,
+    alignItems: 'center',
+    borderRadius: 20,
+    marginTop: 10,
+    padding: 5,
+  },
+  txtContato: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
 });
 
 export default styles;

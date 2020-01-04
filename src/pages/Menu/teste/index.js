@@ -2,13 +2,11 @@ import React from 'react';
 
 import {createMaterialTopTabNavigator} from 'react-navigation-tabs';
 import {createAppContainer} from 'react-navigation';
-import {createStackNavigator} from 'react-navigation-stack';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import Salgados from './Salgados';
 import Hamburguers from './Hambuergs';
-import Buy from '../buy';
 
 const WatchTopTabNavigator = createMaterialTopTabNavigator(
   {
@@ -55,21 +53,4 @@ const WatchTopTabNavigator = createMaterialTopTabNavigator(
   },
 );
 
-const stackMenu = createStackNavigator(
-  {
-    Home: {
-      screen: WatchTopTabNavigator,
-    },
-    Buy: {
-      screen: Buy,
-      navigationOptions: {
-        title: 'Buy',
-      },
-    },
-  },
-  {
-    headerMode: 'none',
-  },
-);
-
-export default createAppContainer(stackMenu);
+export default createAppContainer(WatchTopTabNavigator);

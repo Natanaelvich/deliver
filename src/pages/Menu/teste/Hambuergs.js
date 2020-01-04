@@ -62,39 +62,41 @@ const data = {
 
 export default function teste({navigation}) {
   return (
-    <FlatList
-      showsVerticalScrollIndicator={false}
-      data={data.hambuergs}
-      keyExtractor={item => String(item.id)}
-      renderItem={({item}) => (
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('Buy', {
-              item,
-              name: navigation.getParam('name'),
-            });
-          }}>
-          <View ky={item.id} style={styles.productContainer}>
-            <View style={styles.contImage}>
-              <Image
-                style={styles.avatarProduc}
-                source={{
-                  uri:
-                    'http://lanchonetezerograu.com.br/wp-content/uploads/2018/01/Cheese-Bacon.png',
-                }}
-              />
-            </View>
+    <View style={styles.container}>
+      <FlatList
+        showsVerticalScrollIndicator={false}
+        data={data.hambuergs}
+        keyExtractor={item => String(item.id)}
+        renderItem={({item}) => (
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('Buy', {
+                item,
+                name: navigation.getParam('name'),
+              });
+            }}>
+            <View ky={item.id} style={styles.productContainer}>
+              <View style={styles.contImage}>
+                <Image
+                  style={styles.avatarProduc}
+                  source={{
+                    uri:
+                      'http://lanchonetezerograu.com.br/wp-content/uploads/2018/01/Cheese-Bacon.png',
+                  }}
+                />
+              </View>
 
-            <View style={{width: 150}}>
-              <Text style={styles.producname}>{item.descricao}</Text>
-              <Text numberOfLines={1} style={styles.ingredi}>
-                Igredientes : {item.ingredientes}
-              </Text>
-              <Text style={styles.valor}>Valor :{item.valor}</Text>
+              <View style={{width: 150}}>
+                <Text style={styles.producname}>{item.descricao}</Text>
+                <Text numberOfLines={1} style={styles.ingredi}>
+                  Igredientes : {item.ingredientes}
+                </Text>
+                <Text style={styles.valor}>Valor :{item.valor}</Text>
+              </View>
             </View>
-          </View>
-        </TouchableOpacity>
-      )}
-    />
+          </TouchableOpacity>
+        )}
+      />
+    </View>
   );
 }

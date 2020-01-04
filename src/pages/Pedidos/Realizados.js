@@ -43,7 +43,6 @@ export default function Pedidos() {
         keyExtractor={item => String(item.id)}
         renderItem={({item}) => (
           <View key={item.id} style={styles.containerPedido}>
-            <Text style={styles.txtPedido}>Id : {item.id}</Text>
             <Text style={styles.txtPedido}>Pedido : {item.pedido}</Text>
             <Text style={styles.txtPedido}>
               Estabelecimento : {item.estabelecimento}
