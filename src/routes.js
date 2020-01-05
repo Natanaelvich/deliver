@@ -7,7 +7,6 @@ import Pedidos from './pages/Pedidos';
 import User from './pages/User';
 import Menu from './pages/Menu';
 import Buy from './pages/Menu/buy';
-import Categorias from './pages/Menu/teste02';
 // Custom tabbar component
 import CustomFooterTabBar from './components/CustomFooterTabBar';
 // Tabbar icon sources

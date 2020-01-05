@@ -1,16 +1,13 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StatusBar,
-  TouchableOpacity,
-  SectionList,
-} from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, Image, StatusBar, TouchableOpacity} from 'react-native';
+import SectionList from 'react-native-tabs-section-list';
+import LottieView from 'lottie-react-native';
+
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import styles from './styles';
+import carrinho_small from '../../assets/animations/carrinho-small.json';
 
 const DATA = [
   {
@@ -20,65 +17,98 @@ const DATA = [
       {
         id: 1,
         descricao: 'Hamburguer',
-        ingredientes:
-          'pao, ovo, baicon,pao, ovo, baicon, ovo, baicon, ovo, baicon',
-        valor: 40.99,
-      },
-      {
-        id: 2,
-        descricao: 'Hamburguer',
-        ingredientes: 'pao, ovo, baicon',
-        valor: 18.99,
-      },
-      {
-        id: 3,
-        descricao: 'Hamburguer',
-        ingredientes: 'pao, ovo, baicon',
-        valor: 18.99,
-      },
-      {
-        id: 4,
-        descricao: 'Hamburguer',
-        ingredientes: 'pao, ovo, baicon',
-        valor: 30.99,
-      },
-      {
-        id: 5,
-        descricao: 'Hamburguer',
-        ingredientes: 'pao, ovo, baicon',
-        valor: 18.99,
+        categoria: 'Hamburguers',
+        valor: 15,
+
+        tipos: ['Picanha', 'Cordeiro', 'Boi'],
+        tamanhos: [
+          {
+            tamanho: 'pequeno',
+            price: 15,
+          },
+          {
+            tamanho: 'medio',
+            price: 20,
+          },
+          {
+            tamanho: 'grande',
+            price: 25,
+          },
+        ],
       },
     ],
   },
+
   {
     title: 'Salgados',
     icon: <Icon2 name="food-croissant" size={25} color="#D94A2F" />,
     data: [
       {
         id: 1,
-        descricao: 'coxinha',
-        ingredientes:
-          'pao, ovo, baicon,pao, ovo, baicon, ovo, baicon, ovo, baicon',
-        valor: 40.99,
+        descricao: 'Hamburguer',
+        categoria: 'Hamburguers',
+        valor: 15,
+        tipos: ['Picanha', 'Cordeiro', 'Boi'],
+        price: [15, 20, 25],
+        tamanhos: [
+          {
+            tamanho: 'pequeno',
+            price: 15,
+          },
+          {
+            tamanho: 'medio',
+            price: 20,
+          },
+          {
+            tamanho: 'grande',
+            price: 25,
+          },
+        ],
       },
+    ],
+  },
+  {
+    title: 'Bebidas',
+    icon: <Icon2 name="food-croissant" size={25} color="#D94A2F" />,
+    data: [
       {
-        id: 2,
-        descricao: 'pastel',
-        ingredientes: 'pao, ovo, baicon',
-        valor: 18.99,
-      },
-      {
-        id: 3,
-        descricao: 'pão de queijo',
-        ingredientes: 'pao, ovo, baicon',
-        valor: 18.99,
+        id: 1,
+        descricao: 'Bebidas',
+        categoria: 'Bebidas',
+        valor: 15,
+        tipos: ['Coca-cola', 'Fanta', 'Jesus', 'psiu'],
+        tamanhos: [
+          {
+            tamanho: '500ML',
+            price: 15,
+          },
+          {
+            tamanho: '1L',
+            price: 20,
+          },
+          {
+            tamanho: '2L',
+            price: 25,
+          },
+        ],
       },
     ],
   },
 ];
 
 export default function User({navigation}) {
+  const carrinho = navigation.getParam('carrinho');
+  const produto = navigation.getParam('produto');
+  const valor = navigation.getParam('valor');
+
+  const [produtos, setProdutos] = useState([]);
+
+  function handleNavigationCarrinho() {
+    setProdutos(produtos.concat(produto));
+    console.log(produtos);
+  }
   return (
+    // header
     <View style={styles.container}>
       <View style={styles.headerconatiner}>
         <StatusBar backgroundColor="#D94A2F" barStyle="light-content" />
@@ -96,12 +126,34 @@ export default function User({navigation}) {
 
       <SectionList
         sections={DATA}
-        keyExtractor={(item, index) => item + index}
+        keyExtractor={item => String(item.id)}
+        stickySectionHeadersEnabled={false}
+        scrollToLocationOffset={50}
+        tabBarStyle={styles.tabBar}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        renderTab={({title, isActive}) => (
+          <View
+            style={[
+              styles.tabContainer,
+              {borderBottomWidth: isActive ? 1 : 0},
+            ]}>
+            <Text
+              style={[
+                styles.tabText,
+                {
+                  color: isActive ? '#090909' : '#9e9e9e',
+                },
+              ]}>
+              {title}
+            </Text>
+          </View>
+        )}
         renderItem={({item}) => (
           <TouchableOpacity
             onPress={() => {
               navigation.navigate('Buy', {
-                item,
+                tamanhos: item.tamanhos,
+                tipos: item.tipos,
                 name: navigation.getParam('name'),
               });
             }}>
@@ -116,11 +168,9 @@ export default function User({navigation}) {
                 />
               </View>
 
-              <View style={{width: 150}}>
+              <View style={{width: 150, justifyContent: 'space-around'}}>
                 <Text style={styles.producname}>{item.descricao}</Text>
-                <Text numberOfLines={1} style={styles.ingredi}>
-                  Igredientes : {item.ingredientes}
-                </Text>
+
                 <Text style={styles.valor}>Valor :{item.valor}</Text>
               </View>
             </View>
@@ -134,6 +184,22 @@ export default function User({navigation}) {
           </View>
         )}
       />
+      {/* carrinho */}
+      {carrinho && (
+        <TouchableOpacity
+          onPress={handleNavigationCarrinho}
+          style={styles.carrinhoContainer}>
+          <Text style={styles.txtCarrinho}>Ver carrinho : </Text>
+          <Text style={styles.txtValorCarrinho}>R${valor}</Text>
+          <LottieView
+            style={styles.carrinho_small}
+            source={carrinho_small}
+            resizeMode="contain"
+            autoPlay
+            loop
+          />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
