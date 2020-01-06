@@ -1,7 +1,9 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Alert} from 'react-native';
 import {RadioButton} from 'react-native-paper';
 import LottieView from 'lottie-react-native';
+import InputSpinner from 'react-native-input-spinner';
+
 import carrinho from '../../assets/animations/carrinho.json';
 
 export default function Buy({navigation}) {
@@ -10,7 +12,9 @@ export default function Buy({navigation}) {
 
   const [tamanhoP, setTamanho] = useState('');
   const [tipoP, setTipo] = useState('');
+  const [price, setPrice] = useState(0);
   const [valor, setValor] = useState(0);
+  const [quantidade, setQuantidade] = useState(1);
 
   return (
     <View style={styles.container}>
@@ -21,7 +25,8 @@ export default function Buy({navigation}) {
             value={tamanho.tamanho}
             onPress={() => {
               setTamanho(tamanho.tamanho);
-              setValor(tamanho.price);
+              setPrice(tamanho.price);
+              setValor(tamanho.price * quantidade);
             }}
             status={tamanho.tamanho === tamanhoP ? 'checked' : 'unchecked'}
           />
@@ -42,8 +47,21 @@ export default function Buy({navigation}) {
           <Text>{tipo}</Text>
         </View>
       ))}
-      <Text>{tamanhoP}</Text>
-      <Text>{tipoP}</Text>
+      <View style={styles.spinner}>
+        <InputSpinner
+          max={10}
+          min={1}
+          step={1}
+          colorMax={'#f04048'}
+          colorMin={'#40c5f4'}
+          value={quantidade}
+          onChange={num => {
+            const valorTotal = price * num;
+            setValor(valorTotal);
+            setQuantidade(num);
+          }}
+        />
+      </View>
       <TouchableOpacity
         style={tamanhoP && tipoP ? styles.buttonAdd : styles.buttonAddDesable}
         title="Adicionar carrinho"
@@ -54,6 +72,8 @@ export default function Buy({navigation}) {
                 produto: {
                   tamanho: tamanhoP,
                   tipo: tipoP,
+                  quantidade: quantidade,
+                  total: valor,
                 },
                 valor,
               })
@@ -116,5 +136,8 @@ const styles = StyleSheet.create({
     color: '#01DF3A',
     textShadowColor: '#111',
     textShadowRadius: 5,
+  },
+  spinner: {
+    alignItems: 'center',
   },
 });

@@ -1,13 +1,22 @@
-import React, {useState} from 'react';
-import {View, Text, Image, StatusBar, TouchableOpacity} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StatusBar,
+  TouchableOpacity,
+  BackHandler,
+  Alert,
+} from 'react-native';
 import SectionList from 'react-native-tabs-section-list';
 import LottieView from 'lottie-react-native';
+import {SCLAlert} from 'react-native-scl-alert';
 
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import styles from './styles';
-import carrinho_small from '../../assets/animations/carrinho-small.json';
+import carrinho_small from '../../assets/animations/carrinho_small.json';
 
 const DATA = [
   {
@@ -16,9 +25,31 @@ const DATA = [
     data: [
       {
         id: 1,
-        descricao: 'Hamburguer',
+        descricao: 'Hamburguer Comum',
         categoria: 'Hamburguers',
         valor: 15,
+
+        tipos: ['Picanha', 'Cordeiro', 'Boi'],
+        tamanhos: [
+          {
+            tamanho: 'pequeno',
+            price: 15,
+          },
+          {
+            tamanho: 'medio',
+            price: 20,
+          },
+          {
+            tamanho: 'grande',
+            price: 25,
+          },
+        ],
+      },
+      {
+        id: 2,
+        descricao: 'X BURGUER',
+        categoria: 'Hamburguers',
+        valor: 20,
 
         tipos: ['Picanha', 'Cordeiro', 'Boi'],
         tamanhos: [
@@ -102,10 +133,56 @@ export default function User({navigation}) {
   const valor = navigation.getParam('valor');
 
   const [produtos, setProdutos] = useState([]);
+  const [valorTotal, setValorTotal] = useState(0);
+  const [quantidade, setQauntidade] = useState(0);
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (carrinho) {
+      const total = valorTotal + valor;
+      setValorTotal(total);
+      setProdutos(produtos.concat(produto));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [produto]);
 
   function handleNavigationCarrinho() {
-    setProdutos(produtos.concat(produto));
-    console.log(produtos);
+    navigation.navigate('Carrinho', {produtos, valorTotal});
+  }
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', handleClose);
+  });
+
+  function handleBackButtonPressAndroid() {
+    if (!navigation.isFocused()) {
+      return false;
+    }
+    if (carrinho) {
+      Alert.alert('Se sair seu carrinho sera desfeito');
+      return true;
+    }
+
+    // if (this.isSelectionModeEnabled()) {
+    //   this.disableSelectionMode();
+    //   return true;
+    // } else {
+    //   return false;
+    // }
+  }
+
+  function handleClose() {
+    if (!navigation.isFocused()) {
+      return false;
+    }
+    if (carrinho) {
+      setShow(true);
+      return true;
+    }
+  }
+
+  function handleCloseAlert() {
+    setShow(false);
   }
   return (
     // header
@@ -190,7 +267,7 @@ export default function User({navigation}) {
           onPress={handleNavigationCarrinho}
           style={styles.carrinhoContainer}>
           <Text style={styles.txtCarrinho}>Ver carrinho : </Text>
-          <Text style={styles.txtValorCarrinho}>R${valor}</Text>
+          <Text style={styles.txtValorCarrinho}>R${valorTotal}</Text>
           <LottieView
             style={styles.carrinho_small}
             source={carrinho_small}
@@ -200,6 +277,16 @@ export default function User({navigation}) {
           />
         </TouchableOpacity>
       )}
+      <SCLAlert
+        onRequestClose={handleCloseAlert}
+        theme="danger"
+        show={show}
+        title="OOPS"
+        subtitle="Se voltar seu carrinho será desfeito">
+        <TouchableOpacity onPress={handleCloseAlert}>
+          <Text>Confirmar</Text>
+        </TouchableOpacity>
+      </SCLAlert>
     </View>
   );
 }

@@ -7,6 +7,7 @@ import Pedidos from './pages/Pedidos';
 import User from './pages/User';
 import Menu from './pages/Menu';
 import Buy from './pages/Menu/buy';
+import Carrinho from './pages/Carrinho';
 // Custom tabbar component
 import CustomFooterTabBar from './components/CustomFooterTabBar';
 // Tabbar icon sources
@@ -28,6 +29,12 @@ const menu_buy = createStackNavigator(
       screen: Buy,
       navigationOptions: {
         title: 'Buy',
+      },
+    },
+    Carrinho: {
+      screen: Carrinho,
+      navigationOptions: {
+        title: 'Carrinho',
       },
     },
   },
