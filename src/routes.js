@@ -17,12 +17,13 @@ import OrdersIcon from './assets/order.png';
 import ProfileIcon from './assets/profile.png';
 import {createStackNavigator} from 'react-navigation-stack';
 
-const menu_buy = createStackNavigator(
+const compra = createStackNavigator(
   {
     Menu: {
       screen: Menu,
       navigationOptions: {
         title: 'Menu',
+        bottomTabBarVisible: false,
       },
     },
     Buy: {
@@ -48,13 +49,31 @@ const stackMenu = createStackNavigator(
     MainScreen: {
       screen: MainScreen,
     },
-    menu_buy,
+    Compra: {
+      screen: compra,
+    },
   },
   {
     headerMode: 'none',
   },
 );
-
+//  verify routnavigation and desable tabbottom
+stackMenu.navigationOptions = ({navigation}) => {
+  let tabBarVisible;
+  if (navigation.state.routes.length > 0) {
+    navigation.state.routes.map(route => {
+      if (route.routeName === 'Compra') {
+        tabBarVisible = false;
+      } else {
+        tabBarVisible = true;
+      }
+    });
+  }
+  return {
+    tabBarVisible,
+  };
+};
+//  bottomNavigator with icons
 const TabRoutes = createBottomTabNavigator(
   {
     Home: {
@@ -90,7 +109,7 @@ const TabRoutes = createBottomTabNavigator(
     defaultNavigationOptions: () => ({
       tabBarComponent: CustomFooterTabBar,
       tabBarOptions: {
-        activeTintColor: '#000',
+        activeTintColor: 'orange',
         inactiveTintColor: '#666',
       },
     }),

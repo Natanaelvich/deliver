@@ -139,6 +139,21 @@ const styles = StyleSheet.create({
     textShadowColor: '#111',
     textShadowRadius: 5,
   },
+  buttonSair: {
+    backgroundColor: '#D94A2F',
+    padding: 20,
+    margin: 5,
+    alignItems: 'center',
+  },
+  txtSair: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  boxProduct: {
+    width: 150,
+    justifyContent: 'space-around',
+  },
 });
 
 export default styles;

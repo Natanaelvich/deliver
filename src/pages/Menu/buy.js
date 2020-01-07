@@ -1,21 +1,33 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Alert} from 'react-native';
 import {RadioButton} from 'react-native-paper';
 import LottieView from 'lottie-react-native';
 import InputSpinner from 'react-native-input-spinner';
+import {Checkbox} from 'react-native-paper';
+import {connect} from 'react-redux';
 
 import carrinho from '../../assets/animations/carrinho.json';
 
-export default function Buy({navigation}) {
+function Buy({navigation, dispatch}) {
   const tamanhos = navigation.getParam('tamanhos');
   const tipos = navigation.getParam('tipos');
+  const categoria = navigation.getParam('categoria');
 
   const [tamanhoP, setTamanho] = useState('');
   const [tipoP, setTipo] = useState('');
+  const [saborPizza, setSaborPizza] = useState([]);
   const [price, setPrice] = useState(0);
   const [valor, setValor] = useState(0);
   const [quantidade, setQuantidade] = useState(1);
+  const [checked, setChecked] = useState(false);
 
+  function setCarrinho(data) {
+    navigation.navigate('Menu', {carrinho: true, valor});
+    return {
+      type: 'SET_CARRINHO',
+      data,
+    };
+  }
   return (
     <View style={styles.container}>
       <Text>Escolha o tamanho</Text>
@@ -37,13 +49,37 @@ export default function Buy({navigation}) {
       <Text>Escolha o Sabor</Text>
       {tipos.map(tipo => (
         <View key={tipo} style={styles.optsContainer}>
-          <RadioButton
-            value={tipo}
-            onPress={() => {
-              setTipo(tipo);
-            }}
-            status={tipo === tipoP ? 'checked' : 'unchecked'}
-          />
+          {categoria === 'Pizza' ? (
+            <Checkbox
+              uncheckedColor="#D94A2F"
+              status={saborPizza.includes(tipo) ? 'checked' : 'unchecked'}
+              onPress={() => {
+                if (saborPizza.length < 2) {
+                  if (!saborPizza.includes(tipo)) {
+                    setSaborPizza(saborPizza.concat(tipo));
+                  } else {
+                    saborPizza.filter(sabor => sabor !== tipo);
+                  }
+                } else {
+                  if (saborPizza.includes(tipo)) {
+                    setSaborPizza(saborPizza.filter(sabor => sabor !== tipo));
+                    console.log(saborPizza);
+                  } else {
+                    Alert.alert('Limite de dois sabores');
+                  }
+                }
+              }}
+            />
+          ) : (
+            <RadioButton
+              value={tipo}
+              onPress={() => {
+                setTipo(tipo);
+              }}
+              status={tipo === tipoP ? 'checked' : 'unchecked'}
+            />
+          )}
+
           <Text>{tipo}</Text>
         </View>
       ))}
@@ -63,26 +99,31 @@ export default function Buy({navigation}) {
         />
       </View>
       <TouchableOpacity
-        style={tamanhoP && tipoP ? styles.buttonAdd : styles.buttonAddDesable}
+        style={
+          tamanhoP && (tipoP || saborPizza.length === 2)
+            ? styles.buttonAdd
+            : styles.buttonAddDesable
+        }
         title="Adicionar carrinho"
         onPress={() =>
-          tamanhoP && tipoP
-            ? navigation.navigate('Menu', {
-                carrinho: true,
-                produto: {
+          tamanhoP && (tipoP || saborPizza.length === 2)
+            ? dispatch(
+                setCarrinho({
                   tamanho: tamanhoP,
                   tipo: tipoP,
                   quantidade: quantidade,
                   total: valor,
-                },
-                valor,
-              })
+                  sabores: saborPizza,
+                }),
+              )
             : Alert.alert('Selecione Tamanho e tipo')
         }>
         <Text style={styles.txtCarrinho}>ADIC. CARRINHO </Text>
         <Text
           style={
-            tamanhoP && tipoP ? styles.txtValorCarrinho : styles.txtCarrinho
+            tamanhoP && (tipoP || saborPizza.length === 2)
+              ? styles.txtValorCarrinho
+              : styles.txtCarrinho
           }>
           R${valor}
         </Text>
@@ -107,15 +148,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#D94A2F',
     flexDirection: 'row',
     justifyContent: 'space-around',
-    height: 50,
+    height: 80,
     alignItems: 'center',
   },
   buttonAddDesable: {
-    backgroundColor: '#f5f5f5',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    height: 50,
-    alignItems: 'center',
+    display: 'none',
   },
   optsContainer: {
     backgroundColor: '#f5f5f5',
@@ -124,7 +161,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   carrinho: {
-    height: 50,
+    height: 80,
   },
   txtCarrinho: {
     fontWeight: 'bold',
@@ -141,3 +178,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+export default connect()(Buy);

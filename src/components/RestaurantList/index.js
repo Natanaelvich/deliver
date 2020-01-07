@@ -23,7 +23,7 @@ function RestaurantList({data, navigation}) {
         <TouchableOpacity
           key={item.id}
           onPress={() =>
-            navigation.navigate('Menu', {logo: item.logo, name: item.title})
+            navigation.navigate('Compra', {logo: item.logo, name: item.title})
           }>
           <RestaurantListItem>
             <LogoContainer>

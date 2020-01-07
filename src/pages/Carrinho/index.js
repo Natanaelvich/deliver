@@ -1,29 +1,50 @@
-import React, {useEffect} from 'react';
-import {View, StyleSheet, Text} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, StyleSheet, Text, Button} from 'react-native';
+import {connect} from 'react-redux';
 
-export default function Carrinho({navigation}) {
-  const produto = navigation.getParam('produtos');
+function Carrinho({navigation, produto, dispatch}) {
   const valor = navigation.getParam('valorTotal');
 
+  const [produtos, setProdutos] = useState([]);
+  const [total, setTotal] = useState(0);
+
   useEffect(() => {
-    console.log(produto);
-    console.log(valor);
-  }, [produto, valor]);
+    setProdutos(produto);
+    setTotal(produto.reduce((a, x) => a + x.total, 0));
+  }, [produto]);
+
+  function deleteOnCarrinho(prodCurrent) {
+    const index = produto.indexOf(prodCurrent);
+    if (index > -1) {
+      console.log(produto.splice(index, 1));
+    }
+    return {
+      type: 'DELETE_ON_CARRINHO',
+      data: produto.splice(index, 1),
+    };
+  }
 
   return (
     <View style={styles.container}>
       <Text>Carrinho</Text>
       <View>
-        {produto.map((produt, index) => (
+        {produtos.map((produt, index) => (
           <View key={index} style={styles.contProduct}>
             <Text>{produt.tipo}-</Text>
             <Text>{produt.tamanho} : </Text>
             <Text>x{produt.quantidade} </Text>
             <Text>R$ {produt.total}</Text>
+            <Button
+              title={'remove'}
+              onPress={() => {
+                dispatch(deleteOnCarrinho(produt));
+                console.log(produt);
+              }}
+            />
           </View>
         ))}
       </View>
-      <Text>Total : R${valor}</Text>
+      <Text>Total : R${total}</Text>
     </View>
   );
 }
@@ -40,3 +61,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
+
+const mapStateToProps = state => {
+  const {CARRINHO} = state;
+  return {
+    produto: CARRINHO,
+  };
+};
+export default connect(mapStateToProps)(Carrinho);

@@ -1,5 +1,7 @@
 import React from 'react';
 import {StyleSheet, Platform, StatusBar} from 'react-native';
+import {Provider} from 'react-redux';
+import store from './store';
 
 import './config/ReactotronConfig';
 
@@ -16,12 +18,14 @@ const styles = StyleSheet.create({
 export default function App() {
   return (
     <>
-      <StatusBar
-        style={styles.statusBar}
-        backgroundColor="#ffffff"
-        barStyle="dark-content"
-      />
-      <Routes />
+      <Provider store={store}>
+        <StatusBar
+          style={styles.statusBar}
+          backgroundColor="#ffffff"
+          barStyle="dark-content"
+        />
+        <Routes />
+      </Provider>
     </>
   );
 }

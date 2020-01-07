@@ -6,170 +6,36 @@ import {
   StatusBar,
   TouchableOpacity,
   BackHandler,
-  Alert,
 } from 'react-native';
 import SectionList from 'react-native-tabs-section-list';
 import LottieView from 'lottie-react-native';
 import {SCLAlert} from 'react-native-scl-alert';
-
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
+import {connect} from 'react-redux';
 
 import styles from './styles';
 import carrinho_small from '../../assets/animations/carrinho_small.json';
 
-const DATA = [
-  {
-    title: 'Hamburgues',
-    icon: <Icon name="hamburger" size={25} color="#D94A2F" />,
-    data: [
-      {
-        id: 1,
-        descricao: 'Hamburguer Comum',
-        categoria: 'Hamburguers',
-        valor: 15,
-
-        tipos: ['Picanha', 'Cordeiro', 'Boi'],
-        tamanhos: [
-          {
-            tamanho: 'pequeno',
-            price: 15,
-          },
-          {
-            tamanho: 'medio',
-            price: 20,
-          },
-          {
-            tamanho: 'grande',
-            price: 25,
-          },
-        ],
-      },
-      {
-        id: 2,
-        descricao: 'X BURGUER',
-        categoria: 'Hamburguers',
-        valor: 20,
-
-        tipos: ['Picanha', 'Cordeiro', 'Boi'],
-        tamanhos: [
-          {
-            tamanho: 'pequeno',
-            price: 15,
-          },
-          {
-            tamanho: 'medio',
-            price: 20,
-          },
-          {
-            tamanho: 'grande',
-            price: 25,
-          },
-        ],
-      },
-    ],
-  },
-
-  {
-    title: 'Salgados',
-    icon: <Icon2 name="food-croissant" size={25} color="#D94A2F" />,
-    data: [
-      {
-        id: 1,
-        descricao: 'Hamburguer',
-        categoria: 'Hamburguers',
-        valor: 15,
-        tipos: ['Picanha', 'Cordeiro', 'Boi'],
-        price: [15, 20, 25],
-        tamanhos: [
-          {
-            tamanho: 'pequeno',
-            price: 15,
-          },
-          {
-            tamanho: 'medio',
-            price: 20,
-          },
-          {
-            tamanho: 'grande',
-            price: 25,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    title: 'Bebidas',
-    icon: <Icon2 name="food-croissant" size={25} color="#D94A2F" />,
-    data: [
-      {
-        id: 1,
-        descricao: 'Bebidas',
-        categoria: 'Bebidas',
-        valor: 15,
-        tipos: ['Coca-cola', 'Fanta', 'Jesus', 'psiu'],
-        tamanhos: [
-          {
-            tamanho: '500ML',
-            price: 15,
-          },
-          {
-            tamanho: '1L',
-            price: 20,
-          },
-          {
-            tamanho: '2L',
-            price: 25,
-          },
-        ],
-      },
-    ],
-  },
-];
-
-export default function User({navigation}) {
+function Menu({navigation, DATA, Carrinho, dispatch}) {
   const carrinho = navigation.getParam('carrinho');
-  const produto = navigation.getParam('produto');
-  const valor = navigation.getParam('valor');
 
-  const [produtos, setProdutos] = useState([]);
   const [valorTotal, setValorTotal] = useState(0);
-  const [quantidade, setQauntidade] = useState(0);
+  const [close, setClose] = useState(false);
   const [show, setShow] = useState(false);
+
+  function handleNavigationCarrinho() {
+    navigation.navigate('Carrinho', {valorTotal});
+  }
 
   useEffect(() => {
     if (carrinho) {
-      const total = valorTotal + valor;
-      setValorTotal(total);
-      setProdutos(produtos.concat(produto));
+      setValorTotal(Carrinho.reduce((a, x) => a + x.total, 0));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [produto]);
-
-  function handleNavigationCarrinho() {
-    navigation.navigate('Carrinho', {produtos, valorTotal});
-  }
+  }, [Carrinho]);
 
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', handleClose);
   });
-
-  function handleBackButtonPressAndroid() {
-    if (!navigation.isFocused()) {
-      return false;
-    }
-    if (carrinho) {
-      Alert.alert('Se sair seu carrinho sera desfeito');
-      return true;
-    }
-
-    // if (this.isSelectionModeEnabled()) {
-    //   this.disableSelectionMode();
-    //   return true;
-    // } else {
-    //   return false;
-    // }
-  }
 
   function handleClose() {
     if (!navigation.isFocused()) {
@@ -177,12 +43,24 @@ export default function User({navigation}) {
     }
     if (carrinho) {
       setShow(true);
+      setClose(true);
+      if (close) {
+        setShow(false);
+        navigation.navigate('MainScreen');
+      }
       return true;
     }
   }
 
   function handleCloseAlert() {
     setShow(false);
+    setClose(false);
+  }
+
+  function deleteCarrinho() {
+    return {
+      type: 'DELETE_CARRINHO',
+    };
   }
   return (
     // header
@@ -212,14 +90,14 @@ export default function User({navigation}) {
           <View
             style={[
               styles.tabContainer,
+              // eslint-disable-next-line react-native/no-inline-styles
               {borderBottomWidth: isActive ? 1 : 0},
             ]}>
             <Text
               style={[
                 styles.tabText,
-                {
-                  color: isActive ? '#090909' : '#9e9e9e',
-                },
+                // eslint-disable-next-line react-native/no-inline-styles
+                {color: isActive ? '#090909' : '#9e9e9e'},
               ]}>
               {title}
             </Text>
@@ -231,6 +109,7 @@ export default function User({navigation}) {
               navigation.navigate('Buy', {
                 tamanhos: item.tamanhos,
                 tipos: item.tipos,
+                categoria: item.categoria,
                 name: navigation.getParam('name'),
               });
             }}>
@@ -245,7 +124,7 @@ export default function User({navigation}) {
                 />
               </View>
 
-              <View style={{width: 150, justifyContent: 'space-around'}}>
+              <View style={styles.boxProduct}>
                 <Text style={styles.producname}>{item.descricao}</Text>
 
                 <Text style={styles.valor}>Valor :{item.valor}</Text>
@@ -283,10 +162,20 @@ export default function User({navigation}) {
         show={show}
         title="OOPS"
         subtitle="Se voltar seu carrinho será desfeito">
-        <TouchableOpacity onPress={handleCloseAlert}>
-          <Text>Confirmar</Text>
+        <TouchableOpacity
+          onPress={() => {
+            dispatch(deleteCarrinho());
+            handleClose();
+          }}
+          style={styles.buttonSair}>
+          <Text style={styles.txtSair}>Confirmar</Text>
         </TouchableOpacity>
       </SCLAlert>
     </View>
   );
 }
+
+export default connect(state => ({
+  DATA: state.DATA,
+  Carrinho: state.CARRINHO,
+}))(Menu);
