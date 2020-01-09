@@ -141,8 +141,6 @@ const INITIAL_STATE = {
 };
 
 function reducer(state = INITIAL_STATE, action) {
-  // console.log(action.data);
-  // console.log(state.CARRINHO);
   switch (action.type) {
     case 'DELETE_CARRINHO':
       return {
@@ -156,10 +154,10 @@ function reducer(state = INITIAL_STATE, action) {
         CARRINHO: [...state.CARRINHO, action.data],
       };
 
-    case ' DELETE_ON_CARRINHO':
+    case 'DELETE_ON_CARRINHO':
       return {
         ...state,
-        CARRINHO: action.data,
+        CARRINHO: [...action.data],
       };
 
     default:

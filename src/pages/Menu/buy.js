@@ -19,7 +19,6 @@ function Buy({navigation, dispatch}) {
   const [price, setPrice] = useState(0);
   const [valor, setValor] = useState(0);
   const [quantidade, setQuantidade] = useState(1);
-  const [checked, setChecked] = useState(false);
 
   function setCarrinho(data) {
     navigation.navigate('Menu', {carrinho: true, valor});

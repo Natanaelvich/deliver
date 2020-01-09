@@ -10,51 +10,46 @@ import {
 import SectionList from 'react-native-tabs-section-list';
 import LottieView from 'lottie-react-native';
 import {SCLAlert} from 'react-native-scl-alert';
-import {connect} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 
 import styles from './styles';
 import carrinho_small from '../../assets/animations/carrinho_small.json';
 
-function Menu({navigation, DATA, Carrinho, dispatch}) {
+export default function Menu({navigation}) {
+  const Carrinho = useSelector(state => state.CARRINHO);
+  const DATA = useSelector(state => state.DATA);
+  const dispatch = useDispatch();
+
+  const valorTotal = Carrinho.reduce((a, x) => a + x.total, 0);
   const carrinho = navigation.getParam('carrinho');
 
-  const [valorTotal, setValorTotal] = useState(0);
-  const [close, setClose] = useState(false);
   const [show, setShow] = useState(false);
 
-  function handleNavigationCarrinho() {
-    navigation.navigate('Carrinho', {valorTotal});
-  }
-
   useEffect(() => {
     if (carrinho) {
-      setValorTotal(Carrinho.reduce((a, x) => a + x.total, 0));
+      if (Carrinho.length > 0) {
+        BackHandler.addEventListener('hardwareBackPress', () => {
+          if (!navigation.isFocused()) {
+            return false;
+          }
+          setShow(true);
+          return true;
+        });
+      } else {
+        BackHandler.addEventListener('hardwareBackPress', () => {
+          if (!navigation.isFocused()) {
+            return false;
+          }
+          navigation.navigate('MainScreen');
+          return true;
+        });
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [Carrinho]);
-
-  useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', handleClose);
-  });
-
-  function handleClose() {
-    if (!navigation.isFocused()) {
-      return false;
-    }
-    if (carrinho) {
-      setShow(true);
-      setClose(true);
-      if (close) {
-        setShow(false);
-        navigation.navigate('MainScreen');
-      }
-      return true;
-    }
-  }
+  }, [Carrinho, carrinho]);
 
   function handleCloseAlert() {
     setShow(false);
-    setClose(false);
   }
 
   function deleteCarrinho() {
@@ -62,6 +57,13 @@ function Menu({navigation, DATA, Carrinho, dispatch}) {
       type: 'DELETE_CARRINHO',
     };
   }
+  function handleNavigationCarrinho() {
+    navigation.navigate('Carrinho', {
+      valorTotal,
+      name: navigation.getParam('name'),
+    });
+  }
+
   return (
     // header
     <View style={styles.container}>
@@ -141,7 +143,7 @@ function Menu({navigation, DATA, Carrinho, dispatch}) {
         )}
       />
       {/* carrinho */}
-      {carrinho && (
+      {Carrinho.length > 0 && (
         <TouchableOpacity
           onPress={handleNavigationCarrinho}
           style={styles.carrinhoContainer}>
@@ -164,8 +166,9 @@ function Menu({navigation, DATA, Carrinho, dispatch}) {
         subtitle="Se voltar seu carrinho será desfeito">
         <TouchableOpacity
           onPress={() => {
+            setShow(false);
             dispatch(deleteCarrinho());
-            handleClose();
+            navigation.navigate('MainScreen');
           }}
           style={styles.buttonSair}>
           <Text style={styles.txtSair}>Confirmar</Text>
@@ -174,8 +177,3 @@ function Menu({navigation, DATA, Carrinho, dispatch}) {
     </View>
   );
 }
-
-export default connect(state => ({
-  DATA: state.DATA,
-  Carrinho: state.CARRINHO,
-}))(Menu);
